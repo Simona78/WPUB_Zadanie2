@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: sablona-bp.xml,v 1.3 2006/04/22 09:47:36 jkj Exp $ -->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+<book lang="sk">
+  <bookinfo>
+  
+    <title> <?vskip 5cm?>Vizualizácia a editovanie diagramov viacrozmerného UML</title>
+
+    <subtitle>Bakalárska práca</subtitle>
+
+    <author>
+      <firstname>Simona</firstname>
+
+      <surname>Miková</surname>
+
+      <affiliation>
+        <orgname>Slovenská technická univerzita</orgname>
+
+        <orgdiv role="fakulta">Fakulta informatiky a informačných technológií</orgdiv>
+		
+		<orgdiv role="program">Informatika </orgdiv>
+		<orgdiv role="odbor">9.2.1 Informatika </orgdiv>
+		<orgdiv role="pracovisko">ÚISI, FIIT STU Bratislava </orgdiv>
+      </affiliation>
+    </author>
+
+    <othername role="vedouci">doc. Ing. Ivan Polášek PhD.</othername>
+	
+    <pubdate>Bratislava, 2018</pubdate>
+
+	<abstract>
+      <title> <?vskip 18cm?> Poďakovanie</title>
+
+      <para>
+		Chcela by som sa poďakovať vedúcemu bakalárskej práce doc. Ing.
+		Ivanovi Polášekovi PhD., za konzultácie a odborné rady pri jej
+		vypracovávaní.
+	  </para>
+    </abstract>
+	
+    <abstract>
+      <title>Anotácia</title>
+
+      <para>
+	  Slovenská technická univerzita v Bratislave <?linebreak?> 
+	  FAKULTA INFORMATIKY A INFORMAČNÝCH TECHNOLÓGIÍ <?linebreak?> 
+	  Študijný program: Informatika 3 <?linebreak?> 
+	  Autor: Simona Miková <?linebreak?>
+	  Bakalárska práca: Vizualizácia a editovanie diagramov viacrozmerného UML <?linebreak?>
+	  Vedúci práce: doc. Ing. Polášek Ivan PhD.<?linebreak?>
+      December 2018<?linebreak?></para>
+
+      <para>
+	  Modelovací jazyk UML je v súčasnosti najpoužívanejším jazykom pre
+    tvorbu modelov popisujúcich systém a jeho fungovanie. S rastúcou
+    zložitosťou programov sa ale tieto modely stávajú neprehľadné a
+    ťažké na pochopenie. Práca opisuje dôležitosť modelovania softvéru
+    ako takého a výhody, ktoré by prinieslo pridanie ďalšieho rozmeru do
+    diagramov. Prináša pohľad aj na už <indexterm>
+    <primary>existujúce riešenia</primary>
+</indexterm> vizualizácie
+    diagramov v trojrozmernom priestore. Ďalej opisuje diagram
+    sekvencií, jeho syntax a vysvetľuje metamodel tohto diagramu. Okrem
+    toho práca analyzuje existujúci prototyp vizualizácie sekvenčného
+    diagramu v trojrozmernom priestore, ktorá prebieha v reálnom čase
+    počas ladenia programu. Tento prístup prináša množstvo výhod a
+    uľahčí navigáciu v zdrojovom kóde. Na tomto prototype navrhuje a
+    implementuje ďalšie rozšírenia vizualizácie ako aj editovania vo
+    forme detekcie cyklov v programe a ich následnom obalení fragmentom.
+    Naša práca prináša zaujímavé a inovatívne riešenie využitia tretieho
+    rozmeru pri modelovaní softvéru spojené s možnosťou vizualizácie
+    zdrojového kódu v reálnom čase.
+	  </para>
+    </abstract>
+
+    <abstract lang="en">
+      <title>Annotation</title>
+	  
+      <para>
+    Slovak University of Technology Bratislava <?linebreak?>
+	FACULTY OF INFORMATICS AND INFORMATION TECHNOLOGIES<?linebreak?> 
+	Degree Course: Informatics <?linebreak?>
+	Author: Simona Miková<?linebreak?> 
+	Bachelor thesis: Visualization and editing diagrams of multidimensional UML <?linebreak?>
+	Supervisor: doc. Ing. Polášek Ivan PhD.<?linebreak?>
+    December 2018<?linebreak?>
+       </para>
+
+     <para>Unified modeling language is currently the most widely used language
+    for modeling the system and its functioning, but with the increasing
+    complexity of programs, these models are becoming disarranged and
+    hard to understand. The work describes the importance of modeling
+    the software and benefits, which adding new dimension to the
+    diagrams would bring. It gives insight into the existing solutions
+    for visualizing diagrams in three-dimensional space. It describes
+    the sequence diagram and its syntax and explains the metamodel of
+    this diagram. In addition, the work analyzes existing prototype of
+    the sequence diagram visualization in three-dimensional space that
+    creates the diagram in real time during the program debugging. This
+    approach brings many benefits and it makes navigation in the source
+    code easier. Other visualization extensions as well as diagram
+    editing in form of detection of loops in the source code are
+    designed and implemented on this prototype . Our work brings
+    interesting and innovative solution for the use of third dimension
+    in the software modeling connected with the possibility of
+    visualizing source code in real time.</para>
+
+    </abstract>
+  </bookinfo>
+  
+<index/>
+
+  <chapter>
+    <title>Úvod</title>
+
+    <para>
+    V súčasnosti sú softvérové systémy čoraz viac komplexné a to zvyšuje
+    potrebu ich modelovania a vizualizácie. Najpoužívanejší jazyk v
+    tejto oblasti je v dnešnej dobe Unified Modeling Language, skrátene
+    <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>UML</secondary>
+</indexterm>. Jeho cieľom je poskytnúť štandardnú notáciu, ktorú môže
+    využívať široká škála systémov v každej fáze vývoja softvéru.
+  </para>
+  <para>
+    Takto rozsiahle systémy môžu obsahovať aj milióny riadkov zdrojového
+    kódu. <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>diagram</secondary>
+</indexterm> tried alebo sekvencií takého systému bývajú väčšie
+    ako celá obrazovka a preto navigácia v nich môže byť zložitá a
+    rýchle pochopenie súvislostí takmer nemožné. Problém nastáva práve
+    vtedy, ak sa v takomto systéme vyskytne chyba, ktorú je potrebné
+    rýchlo opraviť. V týchto prípadoch by prácu programátora uľahčilo
+    práve trojrozmerné zobrazenie týchto diagramov v reálnom čase
+    vykonávania programu, prípadne počas ladenia.
+  </para>
+  <para>
+    Prechod od 2D zobrazenia k <indexterm>
+    <primary>3D</primary></indexterm>zobrazeniu by nám teda mohol priniesť množstvo
+    výhod. Pridanie ďalšej dimenzie by znamenalo napríklad nové možnosti
+    rozmiestnenia jednotlivých prvkov diagramu v priestore, čím by sa
+    zvýšila jeho čitateľnosť a prehľadnosť. Pre človeka je taktiež oveľa
+    prirodzenejšie pochopenie súvislostí v trojdimenzionálnom priestore,
+    a preto by zavedenie ďalšej dimenzie v UML diagramoch bolo logickým
+    krokom k vylepšeniu a zjednodušeniu vizualizácie systému.
+  </para>
+  </chapter>
+  
+  <chapter id="analyza">
+	<title>Analýza</title>
+	
+	<para>
+	V tejto kapitole sa budeme venovať analýze súčasných riešení
+    vizualizácie zdrojového kódu pomocou diagramov <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>UML</secondary>
+</indexterm> a ich
+    transformáciou do 3D. V prvej časti sa bližšie zameriame na
+    definície diagramov, konkrétne sekvenčného diagramu, o ktorého 3D
+    vizualizáciu sa budeme usilovať. Ďalšou časťou tejto kapitoly je
+    analýza už existujúcich riešení v porovnaní s naším návrhom. <xref linkend="Modeling"/>
+	</para>
+	
+	<section>
+	<title>Modelovanie softvéru</title>
+	
+	<para>
+      <indexterm>
+    <primary>modelovanie softvéru</primary>
+</indexterm> nám prináša abstrakciu, ktorá môže pomôcť pri
+      zredukovaní zložitosti tvorby softvérov. Namiesto práce so
+      softvérom ako celkom sa tak zaoberáme len jeho určitými časťami <xref linkend="PSI"/>.
+      Taktiež nám modelovanie pomáha lepšie pochopiť vytváraný softvér a
+      vyjadriť naše myšlienky. Podľa Object Modeling Group<footnote>
+	<para>
+		OMG - Object Modeling Group. Viac informácií na <ulink  url="https://www.omg.org/index.htm"/> 
+	</para></footnote> je modelovanie navrhovanie softvérových aplikácií pred samotnou
+      implementáciou . Lepšie porozumenie softvéru môže byť dosiahnuté
+      práve pohľadom z rôznych perspektív, ako napríklad modelmi
+      požiadaviek, statickými či dynamickými modelmi daného softvéru <xref linkend="Modeling"/>.
+      Tieto modely najčastejšie vizualizujeme prostredníctvom
+      dvojdimenzionálnych (2D) diagramov. Jedným z najznámejších jazykov
+      používaných pri modelovaní softvéru je Unified Modeling language,
+      <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>UML</secondary>
+</indexterm>.
+    </para>
+	</section>
+	
+	<section>
+	<title>Unified Modeling Language</title>
+	<para>
+      Unified Modeling Language UML je štandardizovaný modelovací jazyk,
+      určený na tvorbu softvérových modelov opisujúcich systém a jeho
+      architektúru či samotnú funkčnosť . Pozostáva zo súboru diagramov
+      vyvinutých s cieľom pomôcť špecifikovať a vizualizovať softvér či
+      vytvárať a dokumentovať artefakty týchto systémov. Predstavuje
+      veľmi dôležitú časť vývoja objektovo orientovaného softvéru.
+      Používa väčšinou grafické notácie na vyjadrenie návrhu systémov .
+      Cieľom <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>UML</secondary>
+</indexterm> je poskytnúť štandardnú notáciu, ktorú môže využívať
+      široká škála systémov v každej fáze vývoja softvéru .
+    </para>
+	</section>
+	
+	<section>
+	<title>Prechod od 2D zobrazenia k 3D</title>
+	
+	<para>
+      Pri modelovaní softvéru najčastejšie využívame 2D diagramy. Dôvod
+      prečo sa používajú práve 2 dimenzie môže byť ten, že myšlienka
+      načrtnutia diagramu na papier alebo jeho vytvorenie v konkrétnom
+      nástroji, sa javí byť jednoduchšia ako tvorba nejakého 3D modelu <xref linkend="Marcus"/>.
+      Prevládajúce používanie 2D diagramov môžeme priradiť aj
+      skutočnosti, že väčšina týchto diagramov je založená práve na
+      grafoch, ako opisujú v <xref linkend="3DModeling"/>.
+    </para>
+    <para>
+      Avšak stále viac komplexné požiadavky a zložitosť navrhovaných
+      softvérov si vyžaduje zlepšenie vizualizácie a tým lepšie
+      pochopenie vytváraných modelov, pre lepšiu spoluprácu dizajnérov a
+      ich tímov pri návrhu a tvorbe softvéru <xref linkend="PFclanok"/>. Dve dimenzie pri
+      komplexnejších systémoch nemusia stačiť na dostatočne prehľadné
+      znázornenie všetkých vzťahov. Preto by práve zavedie ďalšej
+      dimenzie prinieslo množstvo výhod <xref linkend="virtual"/>.
+    </para>
+	</section>
+	
+	<section>
+	<title>Výhody 3D zobrazenia</title>
+	
+	<para>
+        <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>UML</secondary>
+</indexterm> ako najrozšírenejší modelovací jazyk súčasnosti prezentuje
+        jednotlivé modely iba v 2D podobe. Grafické metódy pre
+        modelovanie softvérových návrhov zdôrazňujú štruktúru a vzťahy
+        medzi jednotlivými prvkami, avšak využívanie len dvoch dimenzií
+        môže mať za následok ťažkosti pri vizualizácii modelov, ako
+        uvádzajú v <xref linkend="Vyhody3D"/>:
+      </para>
+	  
+	  
+	<itemizedlist mark='bullet'>
+        <listitem>
+          <para>
+            Keďže zložitosť softvérov stále rastie, diagramy
+            reprezentujúce tieto softvéry sa rozširujú tiež, niekedy až
+            exponenciálne, a preto pochopenie štruktúry ako celku z
+            daných diagramov môže byť ťažšie.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Keďže diagramy naberajú na veľkosti a zložitosti,
+            usporiadanie sa stáva čoraz ťažšie a časovo náročnejšie a
+            prináša mnohé problémy. <xref linkend="PSI"/>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            V hierarchických štruktúrach sa komponenty z tej istej
+            vrstvy musia zobraziť v hierarchii na rovnakej úrovni. V 2D
+            to znamená lineárne usporiadanie pre každú úroveň, ktoré ale
+            rýchlo spotrebuje priestor. Tieto úrovne sa ale v 3D
+            priestore dajú jednoducho rozložiť na jednotlivé vrstvy.
+          </para>
+        </listitem>
+      </itemizedlist>
+	  
+	  <para>
+        Presunutím diagramov <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>UML</secondary>
+</indexterm> zo štandardného 2D do <indexterm>
+    <primary>3D</primary></indexterm> priestoru, tak
+        umožníme jednoduchšiu a prehľadnejšiu vizualizáciu aj zložitých
+        diagramov v modernej trojrozmernej grafike. Využívaním výhod
+        tretej dimenzie môžeme dosiahnuť oveľa čitateľnejšie a
+        jednoduchšie modely aj pri komplexných systémoch. Navyše s
+        nárastom používania virtuálnej a rozšírenej reality sa zdá, že v
+        budúcnosti bude modelovanie systémov v 3D ešte viac rozšírené <xref linkend="PFclanok"/>.
+      </para>
+    </section>
+	
+	<section>
+	<title>Existujúce riešenia</title>
+	
+	<para>
+      V súčasnosti už existuje viacero rôznych riešení na vizualizáciu
+      <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>UML</secondary>
+</indexterm> diagramov vo viacrozmernom priestore. Navyše toto odvetvie sa
+      stále rýchlejšie rozvíja a objavujú sa taktiež funkčné riešenia
+      vizualizácie s využítím virtuálnej či rozšírenej reality.
+    </para>
+	</section>
+	
+	<section>
+	<title>X3D-UML</title>
+	<para>
+        Extensible 3D (X3D) umožňuje používateľom sťahovať, zobrazovať a
+        interagovať s <indexterm>
+    <primary>3D</primary></indexterm> obsahom prostredníctvom modulu webového
+        prehliadača alebo samostatného prehliadača. X3D poskytuje bohatú
+        sadu funkcií navrhnutých pre vytváranie 3D svetov, ktoré je
+        možné aplikovať pri modelovaní softvéru. Touto myšlienkou sa
+        zaoberal aj Paul McIntosh, ktorý vo svojej práci <xref linkend="springerMcIntosh"/> uvádza možné
+        výhody 	
+<indexterm>
+    <primary>existujúce riešenia</primary>
+	<secondary>X3D-UML</secondary>
+	</indexterm> (spojenia X3D a UML) a využíva práve X3D na
+        vizualizáciu stavového diagramu ako aj diagramu tried v <xref linkend="paulMcIntosh"/>.
+      </para>
+	<figure>
+        <title>Príklad diagramu tried z práce </title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/X3DUML.png" id="obr:Príklad diagramu tried" />
+          </imageobject>
+          <textobject><phrase>Príklad diagramu tried z práce <xref linkend="paulMcIntosh"/>
+          </phrase></textobject>
+        </mediaobject>
+      </figure>
+    </section>
+	
+	<section xml:id="gef-3d">
+      <title>GEF 3D</title>
+      <para>
+        <indexterm>
+    <primary>existujúce riešenia</primary>
+	<secondary>GEF 3D</secondary></indexterm> je rozšírenie Eclipse, ktoré je založené na známom
+        dvojrozmernom grafickom editovacom nástroji Eclipse GEF.
+        Umožňuje nám vytvárať 3D diagramy, 2D diagramy a taktiež
+        kombinovať 3D a 2D diagramy. V konečnom dôsledku sa skôr využíva
+        na vizualizáciu 2D diagramov v 3D priestore, nie na samotnú
+        tvorbu 3D diagramov . Táto vizualizácia sa dosahuje umiestnením
+        2D diagramov do vrstiev a následne môžu byť 3D prvky použité na
+        zobrazenie spojení medzi jednotlivými vrstvami alebo medzi
+        jednotlivými elementami na vrstvách.
+      </para>
+      <figure>
+        <title>Príklad diagramu vytvoreného v GEF3D </title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/gef3D.jpg" id="obr:diaTypes" />
+          </imageobject>
+          <textobject><phrase>Príklad diagramu vytvoreného v GEF3D
+          </phrase></textobject>
+        </mediaobject>
+      </figure>
+    </section>
+    <section xml:id="ogre-3d-prototyp">
+      <title>Ogre 3D prototyp</title>
+      <para>
+        Spomínaný <indexterm><primary>prototyp</primary></indexterm> je vyvíjaný na pôde FIIT STU. Ogre 3D (Open
+        Source 3D Graphics Engine) je engine podporujúci vykresľovanie
+        3D objektov v reálnom čase. Tento prototyp vizualizuje sekvenčný
+        diagram na viacerých vrstvách rozmiestnených v 3D priestore a
+        následne z tohto diagramu vie zostaviť aj diagram tried, ako
+        uvádzajú autori v <xref linkend="gregorovic"/>.
+      </para>
+      <figure>
+        <title>Sekvenčný diagram zobrazený na viacerých vrstvách za
+        použitia prototypu z </title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/Ogre3D.png" id="obr:diaTypes" />
+          </imageobject>
+          <textobject><phrase>Sekvenčný diagram zobrazený na viacerých
+          vrstvách za použitia prototypu z </phrase></textobject>
+        </mediaobject>
+      </figure>
+    </section>
+    <section xml:id="zhrnutie-existujúcich-riešení-a-ich-zhodnotenie">
+      <title>Zhrnutie existujúcich riešení a ich zhodnotenie</title>
+      <para>
+        V súčasnosti je existujúcich riešení na danú problematiku stále
+        viac, no v našej práci sme spomenuli len tie najznámejšie.
+        Väčšina z nich využíva 3D priestor na zobrazenie 2D UML
+        diagramov na viacerých vrstvách. Toto umožňuje zjednodušenie
+        komplexných diagramov a lepšiu orientáciu v nich. Taktiež tým,
+        že je zachované 2D zobrazenie jednotlivých prvkov diagramov, je
+        pre používateľa jednoduché pochopiť dané modely aj pri ich
+        zobrazení v trojdimenzionálnom priestore. Niektoré riešenia v
+        danej oblasti naopak transformujú prvky 2D diagramov na
+        trojrozmerné objekty, čím však môžu zmiasť používateľov pri
+        prvom stretnutí s takýmto typom diagramu.
+      </para>
+    </section>
+  <section xml:id="opis-používaného-prototypu">
+    <title>Opis používaného prototypu</title>
+    <para>
+      V tejto práci budeme pracovať s <indexterm><primary>prototyp</primary></indexterm>om navrhnutým a
+      implementovaným Ing. Jurajom Vincúrom na pôde FIIT STU. Všetky
+      doplnenia funkcionality, ktoré v práci navrhneme budú
+      doimplementované práve do tohto prototypu.
+    </para>
+    <para>
+      Daný prototyp vytvára 3D <indexterm>
+    <primary>modelovanie softvéru</primary>
+    <secondary>diagram</secondary>
+	<tertiary>sekvenčný diagram</tertiary>
+</indexterm>
+ počas ladenia (ang.
+      Debugging) programu. Takýto princíp vizualizácie zdrojového kódu
+      môže byť výhodný pri hľadaní chyby v programe, alebo pri potrebe
+      lepšie sa oboznámiť s kódom. Samotný 3D sekvenčný diagram je
+      vytváraný v programe Unity a podporovaný jazyk, z ktorého vieme
+      daný diagram vizualizovať je Python. Na obrázku nižšie môžeme
+      vidieť ako prebieha vykresľovanie diagramu od začiatku ladenia.
+      Ako prvé z ladiaceho okna programu VS Code inicializujeme
+      sekvenčný diagram v Unity odoslaním inicializačnej správy.
+      Následne môžeme začať <indexterm>
+    <primary>ladenie</primary></indexterm> programu. Pri krokovaní (spôsob
+      ladenia) zdrojového kódu sa stále pri narazení na Break Point
+      odošle správa pomocou komunikačného servera medzi VS Code a Unity
+      obsahujúca potrebné informácie na vykreslenie daného prvku v
+      diagrame sekvencií v Unity. Správa je reprezentovaná dátovým typom
+      Json a nesie informácie o triede, funkcii, ktorá danú interakciu
+      vyvolala, riadku a pod. Komunikácia VS Code s Unity a následné
+      vykreslenie daného prvku sa opakuje až do ukončenia ladenia
+      programu, kedy už môžeme v Unity vidieť scénu s kompletným
+      sekvenčným diagramom aký vidíme napríklad na obrázku <link  linkend="prototyp">2.6.</link>
+    </para>
+    <figure>
+      <title>Proces vizualizácie diagramu v prototype</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/diagram.png" id="obr:diaTypes" />
+        </imageobject>
+        <textobject><phrase>Proces vizualizácie diagramu v
+        prototype</phrase></textobject>
+      </mediaobject>
+    </figure>
+    <section xml:id="ukážka-vizualizovaného-sekvenčného-diagramu">
+      <title>Ukážka vizualizovaného sekvenčného diagramu</title>
+      <para>
+        Na obrázku <link  linkend="prototyp">2.6.</link> môžeme vidieť <indexterm>
+    <primary>modelovanie softvéru</primary>
+    <secondary>diagram</secondary>
+	<tertiary>sekvenčný diagram</tertiary>
+</indexterm>
+, ktorý vznikol
+        pri ladení zdrojového kódu z obrázku <link  linkend="code">2.5.</link>
+      </para>
+      <figure id="code">
+        <title>Ukážka použitého zdrojového kódu</title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/code.png" id="obr:diaTypes" />
+          </imageobject>
+          <textobject><phrase>Ukážka použitého zdrojového
+          kódu</phrase></textobject>
+        </mediaobject>
+      </figure>
+      <para>
+        Daný kód obsahuje 2 triedy s názvami Test a Test1. Triedy sú vo
+        výslednom sekvenčnom diagrame zobrazované ako biele obdĺžníky s
+        názvom danej triedy. Z týchto tried následne vychádzajú čiary
+        života, ktoré sú vedené vertikálne pozdĺž celej scény a
+        reprezentujú plynutie času, tak ako je to v diagrame sekvencií
+        zaužívané. Správy sú zobrazované jednoduchými šípkami
+        umiestenými na čiare života korešpondujúcej triedy v časovom
+        slede podľa ich volania počas vykonávania programu. Návratové
+        správy sú zobrazené prerušovanou šípkou smerujúcou v opačnom
+        smere. Nad oboma typmi správ môžeme vidieť názov metódy, ktorá
+        interakciu vyvolala.
+      </para>
+      <figure id="prototyp">
+        <title>Sekvenčný diagram vizualizovaný použitým
+        prototypom</title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/sequenceDiagramPrototyp.png" id="prototyp" />
+          </imageobject>
+          <textobject><phrase>Sekvenčný diagram vizualizovaný použitým
+          prototypom</phrase></textobject>
+        </mediaobject>
+      </figure>
+    </section>
+  </section>
+  <section id="technologie">
+    <title>Technológie použité v prototype</title>
+    <para>
+      V tejto časti si priblížime technológie a jednotlivé vývojové
+      prostredia, ktoré sú v prototype použité a v ich používaní budeme
+      naďalej pokračovať.
+    </para>
+    <section xml:id="unity">
+      <title>Unity</title>
+      <para>
+        <indexterm>
+    <primary>3D</primary>
+	<secondary>Unity</secondary>
+	</indexterm> je multiplatformový herný engine vyvinutý spoločnosťou
+        Unity Technologies. V súčasnosti je Unity široko využívané,
+        keďže môže byť použité na vytváranie dvojrozmerných ale aj
+        trojrozmerných hier, ako aj rôznych simulácií pre mnohé
+        platformy v reálnom čase . Unity je taktiež preferovaným
+        vývojovým nástrojom pre tvorcov XR (virtuálnej a rozšírenej
+        reality).
+      </para>
+    </section>
+    <section xml:id="c">
+      <title>C#</title>
+      <para>
+        Práve jazyk C# sa používa na vytváranie skriptov v <indexterm>
+    <primary>3D</primary>
+	<secondary>Unity</secondary>
+	</indexterm>.
+        Pomocou týchto skriptov môžeme ovládať vizualizované objekty na
+        scéne. C# je objektovo orienotaný programovací jazyk vytvorený
+        spoločnosťou Microsoft. Microsoft si za základ pre tento nový
+        jazyk zobral jazyky C++ a Java . Programátori, ktorí vedia
+        používať niektorý zo spomínaných jazykov, by nemali mať žiadny
+        problém s programovaním v jazyku C#.
+      </para>
+    </section>
+    <section xml:id="visual-studio-code">
+      <title>Visual Studio Code</title>
+      <para>
+        Visual Studio Code je editor zdrojového kódu vyvinutý
+        spoločnosťou Microsoft pre systémy Windows, Linux a MacOS .
+        Kvôli jeho funkciám predstavuje výkonný vývojársky nástroj.
+        Obsahuje podporu pre <indexterm>
+    <primary>ladenie</primary></indexterm>, ovládanie Gitu priamo z aplikácie,
+        inteligentné dokončovanie kódu či refaktorovanie kódu.
+      </para>
+      <para>
+        VS Code nám taktiež umožňuje používanie mnohých rozšírení
+        tretích strán ako aj vytvorenie vlastného rozšírenia podľa
+        potreby. Taktiež nám umožňuje vytvoriť vlastné rozšírenie
+        ladenia programu, ktoré potrebujeme, aby sme vedeli komunikovať
+        s Unity, čo je aj jedným z hlavných dôvodov, prečo sme si dané
+        prostredie vybrali.
+      </para>
+    </section>
+    <section xml:id="python">
+      <title>Python</title>
+      <para>
+        Python je interpretovaný, interaktívny programovací jazyk, ktorý
+        vytvoril Guido van Rossum, pôvodne ako skriptovací jazyk pre
+        Amoeba OS schopný systémových volaní. Python je vyvíjaný ako
+        open source projekt. Podporuje objektovo orientované,
+        štruktúrované aj funkcionálne programovanie. Je to dynamický
+        typový jazyk, podporuje veľké množstvo vysokoúrovňových dátových
+        typov .
+      </para>
+      <para>
+        Ďalšou dôležitou vlastnosťou Pythonu je to, že sa dá jednoducho
+        rozširovať. Nové moduly môžu byť napísané v C alebo C++. Tiež
+        môže byť použitý ako rozširovací jazyk pre existujúce moduly a
+        aplikácie.
+      </para>
+    </section>
+    <section xml:id="json">
+      <title>JSON</title>
+      <para>
+        JSON (JavaScript Object Notation) predstavuje textový spôsob
+        zápisu dát, ktorý je nezávislý na počítačovej platforme. Slúži
+        na prenos dát. JSON je textový formát, ktorý je úplne jazykovo
+        nezávislý, ale používa konvencie, ktoré sú známe programátorom
+        rodiny C jazykov, vrátane C, C ++, C#, Java, JavaScript, Perl,
+        Python a mnoho ďalších <xref linkend="JSON"/>. Pre človeka je ľahké pochopiteľný a
+        čitateľný a pre počítače zase ľahko spracovateľný. Práve tieto
+        vlastnosti robia z neho ideálny jazyk na výmenu dát.
+      </para>
+      <para>
+        JSON môže byť interpretovaný:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            ako súbor dvojíc názov/hodnota. V rôznych jazykoch je to
+            realizované ako objekt, záznam, štruktúra, slovník,
+            hashovacia tabuľka či asociačné pole <xref linkend="JSON"/>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            ako usporiadaný zoznam hodnôt. Vo väčšine jazykov sa
+            realizuje ako pole, vektor, zoznam alebo postupnosť <xref linkend="JSON"/>.
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        JSON je teda univerzálna dátová štruktúra. Prakticky všetky
+        moderné programovacie jazyky ich podporujú v jednej či druhej
+        forme.
+      </para>
+      <figure>
+        <title>Príklad JSON-u používaného na komunikáciu medzi Unity a
+        VS Code v prototype</title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/json.png" id="obr:diaTypes" />
+          </imageobject>
+          <textobject><phrase>Príklad JSON-u používaného na komunikáciu
+          medzi Unity a VS Code v prototype</phrase></textobject>
+        </mediaobject>
+      </figure>
+    </section>
+  </section>
+  <section xml:id="sekvenčný-diagram">
+    <title>Sekvenčný diagram</title>
+    <para>
+      V našej práci budeme bližšie pracovať práve so sekvenčným
+      diagramom. Diagram sekvencií je najbežnejším typom interakčného
+      diagramu, ktorý zobrazuje interakcie objektov v čase . V
+      terminológii UML interakcia predstavuje jednotku správania, ktorá
+      sa zameriava na pozorovateľnú výmenu informácií medzi jednotlivými
+      elementami diagramu (napríklad medzi objektami) v podobe správ .
+      <indexterm>
+    <primary>modelovanie softvéru</primary>
+    <secondary>diagram</secondary>
+	<tertiary>sekvenčný diagram</tertiary>
+</indexterm>
+ túto interakciu opisuje tým, že sa zameriava na
+      postupnosť správ, ktoré sú vymieňané medzi objektami, spolu s ich
+      korešpondujúcim výskytom na čiarach života <xref linkend="seqOpis"/>.
+    </para>
+    <section xml:id="syntax-diagramu-sekvencií">
+      <title>Syntax diagramu sekvencií</title>
+      <para>
+        Syntax definovaná v špecifikácii UML pozostáva z konkrétnej
+        syntaxe, ktorá definuje používanú grafickú notáciu a abstraktnej
+        syntaxe. Abstraktná syntax je daná <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>metamodel</secondary>
+</indexterm>om definujúcim
+        vzťahy medzi prvkami .
+      </para>
+    </section>
+    <section xml:id="abstraktná-syntax-a-metamodel">
+      <title>Abstraktná syntax a metamodel</title>
+      <para>
+        Abstraktná syntax je definovaná metamodelovaním. Pod pojmom
+        <indexterm>
+	<primary>modelovanie softvéru</primary>
+    <secondary>metamodel</secondary>
+</indexterm> môžeme teda chápať akúsi abstrakciu, ktorá definuje
+        štruktúru modelu UML. Potom každý UML model je konkrétnou
+        inštanciou metamodelu tohto typu. Metamodel na obrázku <link  linkend="metamodel">2.8.</link> je
+        prevzatý z UML Superstructure Specification dostupnej na .
+      </para>
+      <para>
+        V danom metamodeli môžeme vidieť triedy, ktoré by predstavovali
+        jednotlivé prvky sekvenčného diagramu alebo ich časti, spolu s
+        ich kardinalitami. Každá interakcia sa skladá z čiar života,
+        správ a môže taktiež obsahovať fragment, alebo akciu. Trieda
+        InteractionFragment predstavuje abstraktnú triedu pre triedy
+        CombinedFragment a ExecutionSpecification, ktorá znamená
+        vykonanie operácie alebo správania. V ďalšej časti sa pozrieme
+        na konkrétne príklady metamodelov sekvenčného diagramu, kde
+        bližšie opíšeme aj ďalšie jeho časti.
+      </para>
+      <figure id="metamodel">
+        <title>Metamodel sekvenčného diagramu </title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/metamodel.png" id="obr:diaTypes" contentwidth="4in" contentdepth="3in"/>
+          </imageobject>
+          <textobject><phrase>Metamodel sekvenčného diagramu
+          </phrase></textobject>
+        </mediaobject>
+      </figure>
+    </section>
+    <section xml:id="konkrétne-príklady-sekvenčného-diagramu-a-jeho-metamodelu">
+      <title>Konkrétne príklady sekvenčného diagramu a jeho
+      metamodelu</title>
+      <para>
+        Na pravej strane obrázku <link  linkend="example1">2.9</link> môžeme vidieť metamodel sekvenčného
+        diagramu sd1. Trieda Interaction, predstavuje konkrétnu
+        interakciu, ktorú daný <indexterm>
+    <primary>modelovanie softvéru</primary>
+    <secondary>diagram</secondary>
+	<tertiary>sekvenčný diagram</tertiary>
+</indexterm>
+ zachytáva. Interakcia
+        obsahuje typy Lifeline, Message a MessageOccurenceSpecification.
+        Presnejšie bude interakcia obsahovať čiaru života a aj b a
+        správu m1, ktorá sa posiela. Ako vidíme, správa musí mať
+        definovaný bod začiatku a konca na konkrétnej čiare života, na
+        čo nám slúžia konkrétne inštancie triedy
+        MessageOccuranceSpecification.
+      </para>
+      <figure id="example1">
+        <title>Príklad konkretnej a abstraktnej syntaxe v jednoduchom
+        diagrame z </title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/sequenceExample.png" id="obr:diaTypes" contentwidth="4in" contentdepth="3in" />
+          </imageobject>
+          <textobject><phrase>Príklad konkretnej a abstraktnej syntaxe v
+          jednoduchom diagrame z </phrase></textobject>
+        </mediaobject>
+      </figure>
+      <figure id="example2">
+        <title>Príklad konkretnej a abstraktnej syntaxe v komplexnejšom
+        diagrame z </title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/sequenceExample2.png" id="obr:diaTypes" contentwidth="4in" contentdepth="3in"/>
+          </imageobject>
+          <textobject><phrase>Príklad konkretnej a abstraktnej syntaxe v
+          komplexnejšom diagrame z </phrase></textobject>
+        </mediaobject>
+      </figure>
+      <para>
+        Ak by sa v sekvenčnom diagrame nachádzal aj fragment, ktorý by
+        prekrýval obe čiary života a aj b a obsahoval by správu m1, do
+        metamodelu by nám pribudli ďalšie tri triedy, ktorý by daný
+        fragment definovali, ako môžeme vidieť na obrázku <link  linkend="example2">2.10.</link> Trieda
+        CombinedFragment obsahuje typ InteractionOperand a slúži na to,
+        aby sme vedeli definovať typ operátora. Trieda
+        interactionOperand zase obsahuje typ InteractionConstraint a
+        táto zase určuje podmienku, v našom prípade [b.d &gt; 5].
+      </para>
+    </section>
+  </section>
+</chapter>
+
+<chapter>
+  <title>Návrh riešenia</title>
+  <para>
+    Prvú časť tejto práce sme venovali <link  linkend="analyza">analýze</link> problémovej oblasti.
+    Zaoberali sme sa najmä vizualizáciou UML diagramov v trojrozmernom
+    priestore a už existujúcimi riešeniami v tejto oblasti a došli sme k
+    záveru, že transformácia zobrazenia do trojrozmerného priestoru, by
+    mohla pomôcť pri orientácii v komplexnejších UML diagramoch.
+  </para>
+  <para>
+    Na základe poznatkov získaných z analýzy môžeme pokračovať v návrhu
+    riešenia, ktoré bude implementované do už spomínaného prototypu.
+  </para>
+  <section xml:id="ciele-práce">
+    <title>Ciele práce</title>
+    <para>
+      Cieľom tejto práce je vizualizovať sekvenčný diagram v
+      trojrozmernom priestore. Naša práca sa od už existujúcich riešení
+      líši v tom, že diagram budeme vytvárať počas ladenia programu, čo
+      môže programátorom priniesť veľké množstvo výhod a taktiež im
+      ušetriť čas pri oprave chýb. Za kladný výsledok práce budeme
+      považovať vizualizáciu sekvenčného diagramu v trojrozmernom
+      priestore s možnosťou jeho editovania. Budeme sa snažiť využiť
+      zobrazenie diagramov na viacerých vrstvách v priestore a schopnosť
+      detekovať prítomnosť cyklov vo vizualizovanom zdrojovom kóde.
+    </para>
+  </section>
+  <section>
+    <title>Použité technológie</title>
+    <para>
+      Ako sme už v <link  linkend="technologie">návrhu</link> bližšie špecifikovali, sekvenčný diagram bude
+      vytváraný v prostredí <indexterm>
+    <primary>3D</primary>
+	<secondary>Unity</secondary>
+	</indexterm> a budeme ho môcť generovať z programov
+      napísaných v jazyku Python. Ako ladiace prostredie využijeme
+      rozšírenia ladiaceho nástroja programu VS Code. Na výmenu dát
+      medzi prostredím VS Code a Unity budeme používať JSON.
+    </para>
+  </section>
+  <section>
+    <title>Zobrazenie diagramov na viacerých vrstvách</title>
+    <para>
+      Keďže sa nachádzame v trojrozmernom priestore môžeme využiť na
+      vizualizáciu diagramu viacero vrstiev. Vrstvy v Unity umožňujú
+      vykresľovanie alebo osvetlenie iba časti scény. Taktiež sa
+      používajú na selektívne usporiadanie objektov, napríklad kvôli
+      zabráneniu kolíziám. V tejto práci budeme vrstvy využívať na
+      zobrazenie viacerých sekvenčných diagramov vedľa seba alebo za
+      sebou, ako môžeme vidieť na obrázku <link  linkend="layers">3.1.</link> Takýmto spôsobom môžeme
+      vizualizovať viacero diagramov v prostredí naraz, pričom všetky
+      budú dobre viditeľné a čitateľné.
+    </para>
+    <para>
+      V Unity si vieme vytvoriť viacero vrstiev, ku ktorým vieme
+      následne počas behu programu pristupovať a umiestňovať na nich
+      jednotlivé objekty, čo v našom prípade bude sekvenčný diagram a
+      jeho prvky. Sekvenčné diagramy budeme navzájom odlišovať pomocou
+      jedinečného id a pri začatí vykresľovania ich pozíciu posunieme
+      vždy kúsok ďalej od predchádzajúceho diagramu, aby sme zaručili
+      prehľadné zobrazenie.
+    </para>
+    <figure id="layers">
+      <title>Ukážka diagramu na viacerých vrstvách</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/layers.png" id="obr:diaTypes" contentwidth="5in" contentdepth="4in"/>
+        </imageobject>
+        <textobject><phrase>Ukážka diagramu na viacerých
+        vrstvách</phrase></textobject>
+      </mediaobject>
+    </figure>
+  </section>
+  <section>
+    <title>Parsovanie zdrojového kódu</title>
+    <para>
+      Parsovanie alebo syntaktická analýza je proces, v ktorom
+      analyzujeme príkazy alebo reťazce symbolov v programovacích
+      jazykoch alebo dátových štruktúrach zodpovedajúce pravidlám
+      formálnej gramatiky, teda súboru pravidiel, ktorý opisuje syntax
+      jazyka .
+    </para>
+    <para>
+      Výstupom parsera je organizovaná dátová štruktúra, zvyčajne strom.
+      Stromy sa využívajú práve preto, že predstavujú jednoduchý a
+      prirodzený spôsob práce s kódom a rôznou úrovňou jeho detailov.
+      Môže sa jednať o syntaktický strom (ang. Parse Tree) alebo
+      abstraktný syntaktický strom (ang. Abstract Parsing Tree),
+      skrátene AST. Tieto dve štruktúry sú si veľmi podobné. Obidve sú
+      stromy, ale líšia sa v tom, ako presne a do akých detailov sú
+      schopné reprezentovať daný <indexterm>
+    <primary>zdrojový kód</primary></indexterm>. Technicky vzato by sa
+      Parse Tree mohol nazývať aj Concrete Syntax Tree, skrátene CST,
+      teda konkrétny syntaktický strom, pretože by mal konkrétnejšie
+      odrážať skutočnú syntax v porovnaní s AST .
+    </para>
+    <para>
+      CST obsahuje všetky tokeny, ktoré sa objavili v programe. Naopak
+      AST predstavuje akoby vylepšenú verziu, v ktorej sa odstránia
+      všetky informácie, ktoré by mohli byť odvodené alebo nie sú
+      dôležité pre pochopenie kódu. V našej práci je teda logickejšie
+      využívať pri parsovaní štruktúru AST.
+    </para>
+    <figure>
+      <title>Ukážka abstraktného syntaktického stromu z </title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/astTree.png" id="obr:diaTypes" />
+        </imageobject>
+        <textobject><phrase>Ukážka abstraktného syntaktického stromu z <xref linkend="astTree"/>
+        </phrase></textobject>
+      </mediaobject>
+    </figure>
+  </section>
+  <section>
+    <title>Detekcia cyklov v programe</title>
+    <para>
+      Ako môžeme vidieť na obrázku <link  linkend="loop">3.3</link> medzi triedou Test a Test1 sa
+      viackrát opakuje volanie tej istej metódy. Na základe toho
+      usudzujeme, že v programe sa nachádza cyklus, ktorého metódy by
+      mali byť pri vizualizácii správne zaobalené do fragmentu.
+    </para>
+    <para>
+      Detekovať cyklus môžeme už pri parsovaní zdrojového kódu, kedy by
+      sme mohli v pomocnej metóde testovať či aktuálne parsovaný riadok
+      neobsahuje jedno z kľúčových slov pre zápis cyklov v danom jazyku
+      (for, while a pod.), alebo danú informáciu získať priamo z AST,
+      ktorý je počas parsovania vytváraný. Túto informáciu o výskyte
+      cyklu, počte jeho opakovaní a jeho metódach, by sme uložili do
+      jsonu, pomocou ktorého komunikujeme so scénou vizualizovaného
+      sekvenčného diagramu a následne by sa v Unity dané metódy
+      zaobalili do fragmentu. Umiestňovanie správ na čiary života v
+      danej časovej postupnosti, by ostalo nezmenené.
+    </para>
+    <figure id="loop">
+      <title>Ukážka opakovaných volaní</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/loop.png" id="obr:diaTypes" contentwidth="5in" contentdepth="4in"/>
+        </imageobject>
+        <textobject><phrase>Ukážka opakovaných
+        volaní</phrase></textobject>
+      </mediaobject>
+    </figure>
+  </section>
+</chapter>
+
+<chapter>
+  <title>Záver</title>
+  <para>
+    Zadaním tejto bakalárskej práce bola vizualizácia a editovenie
+    diagramov UML v trojrozmernom priestore. Ako konkrétny diagram, s
+    ktorým sme pracovali, sme si vybrali sekvenčný diagram, ktorý
+    zachytáva interakciu objektov v čase. Práve postupnosť volaní
+    jednotlivých funkcií zobrazená v diagrame sekvencií, môže uľahčiť
+    programátorom prácu pri chápaní zdrojového kódu či ladení programu,
+    preto sme sa sústredili práve na vizualizáciu diagramu počas ladenia
+    programu. Vrámci analýzy sme sa zaoberali samotným modelovaním
+    softvéru, výhodami, ktoré by mohlo priniesť používanie ďalšieho
+    rozmeru a už existujúcimi riešeniami v danej oblasti.
+   </para>
+   <para>
+    Pri práci na bakalárskom projekte v zimnom semestri sa nám prvú
+    polovicu semestra darilo dodržiavať stanovené termíny, no v druhej
+    polovici už plnenie plánu bolo pomalšie ako naše očakávania. Prispel
+    k tomu najmä nedostatok času a možno náročnejšia implementačná časť.
+    Spomínané meškanie v plnení plánu v prvom semestri zmiernime
+    intenzívnejšou prácou na implementácii daných riešení do prototypu v
+    druhom semestri.
+   </para>
+ </chapter>
+  
+  <bibliography>
+    <title>Literatúra</title>
+
+	<bibliomixed id="Vyhody3D">
+		<bibliomset relation='article'>
+			<surname>Dwyer</surname>, <firstname>Tim</firstname>.
+			<title role='article'>Three Dimensional UML Using Force Directed Layout</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>Proceedings of the 2001 Asia-Pacific Symposium on Information Visualisation</title> 
+			<volumenum>Volume 9</volumenum>,
+			<pagenums>77-85</pagenums>,
+			<publishername>Australian Computer Society, Inc.</publishername>
+			<pubdate>2001</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+	
+	<bibliomixed id="PFclanok">
+		<bibliomset relation='article'>
+			M. Ferenc, I. Polasek, and J. Vincur.
+			<title role='article'>2017 IEEE Working Conference on Software Visualization (VISSOFT)</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>Collaborative Modeling and Visualization of Software Systems Using Multidimensional UML</title> ,
+			<pagenums>99-103</pagenums>,
+			<pubdate>Sept 2017</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+	
+	<bibliomixed id="astTree">Peter Fritzson, Pavol Privitzer, Martin Sjölund, and Adrian Pop.
+	<title>Towards a Text Generation Template Language for Modelica</title>. 09 2009
+    </bibliomixed>
+	
+	<bibliomixed id="3DModeling">
+		<bibliomset relation='article'>
+			Joseph Gil and Stuart Kent
+			<title role='article'>Three Dimensional Software Modelling</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>Proceedings of the 20th International Conference on Software Engineering</title> ,
+			<pagenums>105-114</pagenums>,
+			<publishername>IEEE Computer Society</publishername>
+			<pubdate>1998</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+	
+	<bibliomixed id="Modeling">Hassan Gomaa.
+	<title>Software modeling and design: UML, use cases, patterns, and software architectures</title>. Cambridge University Press, 2011
+    </bibliomixed>
+	
+	<bibliomixed id="gregorovic">
+		<bibliomset relation='article'>
+			 Lukáš Gregorovič, Ivan Polasek, and Branislav Sobota
+			<title role='article'>Software Model Creation with Multidimensional UML</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>Information and Communication Technology: Third IFIP TC 5/8 International Conference, ICT-EurAsia 2015, and 9th IFIP WG 8.9 Working Conference, CONFENIS 2015, Held as Part of WCC 2015, Daejeon, Korea, October 4-7, 2015, Proceedings</title> ,
+			<publishername>Springer International Publishing</publishername>
+			<pubdate>2015</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+	
+	<bibliomixed id="PSI"> Mária Bieliková Jakub Šimko, Marián Šimko.
+	<title>Softvérové inžinierstvo v otázkach a odpovediach</title>. Slovenská technická univerzita v Bratislave, 2017
+    </bibliomixed>
+	
+    <bibliomixed id="JSON">JSON manual. <title>Introducing JSON</title>.  
+    <bibliomisc><ulink
+    url="https://www.json.org/"></ulink></bibliomisc></bibliomixed>
+	
+	<bibliomixed id="virtual">
+		<bibliomset relation='article'>
+			  C. Knight and M. Munro. 
+			<title role='article'>Virtual but visible software</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>2000 IEEE Conference on Information Visualization. An International Conference on Computer Visualization and Graphics</title> ,
+			<pagenums>198-205</pagenums>,
+			<pubdate>2000</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+	
+	<bibliomixed id="seqOpis">
+		<bibliomset relation='article'>
+			  Xiaoshan Li, Zhiming Liu , and H Jifeng. 
+			<title role='article'>A formal semantics of UML sequence diagram</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>Proceedings of the Australian Software Engineering Conference, ASWEC</title> ,
+			<pagenums>168- 177</pagenums>,
+			<pubdate>02 2004</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+	
+	<bibliomixed id="Marcus">
+		<bibliomset relation='article'>
+			 Andrian Marcus, Louis Feng, and Jonathan I. Maletic. 
+			<title role='article'>3D Representations for Software Visualization</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>Proceedings of the 2003 ACM Symposium on Software Visualization</title> ,
+			<publishername>ACM</publishername>
+			<pubdate>2003</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+	
+	<bibliomixed id="paulMcIntosh">
+		<bibliomset relation='article'>
+			  Paul McIntosh, Margaret Hamilton, and Ron van Schyndel. 
+			<title role='article'>X3D-UML: Enabling Advanced UML Visualisation Through X3D</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>Proceedings of the Tenth International Conference on 3D Web Technology</title> ,
+			<pagenums>135-142</pagenums>,
+			<publishername>ACM</publishername>
+			<pubdate>2005</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+	
+	<bibliomixed id="springerMcIntosh">
+		<bibliomset relation='article'>
+			  Paul McIntosh, Margaret Hamilton, and Ron van Schyndel. 
+			<title role='article'>X3D-UML: 3D UML State Machine Diagrams</title>.
+		</bibliomset>
+		<bibliomset relation='journal'>
+			<title>Model Driven Engineering Languages and Systems</title> ,
+			<pagenums>264-279</pagenums>,
+			<publishername>Springer Berlin Heidelberg</publishername>
+			<pubdate>2008</pubdate>
+		</bibliomset>.
+	</bibliomixed>
+  </bibliography>
+  
+  <appendix>
+    <title>Plán práce</title>
+	<table frame='all'><title>Plán práce</title>
+		<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+			<colspec colname='c1'/>
+			<colspec colname='c2'/>
+			<colspec colname='c3'/>
+			<colspec colnum='5' colname='c5'/>
+			<thead>
+				<row>
+				  <entry><emphasis>Týždeň</emphasis></entry>
+				  <entry><emphasis>1. semester</emphasis></entry>
+				  <entry><emphasis>2. semester</emphasis></entry>
+				</row>
+			</thead>
+			<tbody>
+				<row>
+				  <entry><emphasis role="bold">1. týždeň</emphasis></entry>
+				  <entry>oboznámenie sa s témou, vyhľadánie materiálov</entry>
+				  <entry>implementácia detekovania cyklov v zdrojovom kóde</entry>
+				</row>
+				<row>
+				  <entry><emphasis role="bold">2. – 3. týždeň</emphasis></entry>
+				  <entry>oboznámenie sa s prototypom a jeho analýza</entry>
+				  <entry>návrh riešenia detekovania vnorených cyklov a jeho implementácia</entry>
+				</row>
+				<row>
+				  <entry><emphasis role="bold">4. - 6. týždeň</emphasis></entry>
+				  <entry>študium zdrojov, tutoriály programovania v Unity</entry>
+				  <entry>pokračovanie na pridávaní ďalších funkcií do prototypu</entry>
+				</row>
+				<row>
+				  <entry><emphasis role="bold">7. – 9. týždeň</emphasis></entry>
+				  <entry>implementácia zobrazovania diagramov na viacerých vrstvách, analýza danej oblasti</entry>
+				  <entry>pokračovanie na pridávaní ďalších funkcií do prototypu, testovanie</entry>
+				</row>
+				<row>
+				  <entry><emphasis role="bold">10. – 12. týždeň</emphasis></entry>
+				  <entry>návrh implementácie detekovania cyklov v zdrojovom kóde, písanie analýzy</entry>
+				  <entry>overovanie výsledkov a dokončenie práce</entry>
+				</row>
+			</tbody>
+		</tgroup>
+	</table>
+  </appendix>
+</book>
